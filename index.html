@@ -1,217 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jacquard Cyanotype Exposure Calculator</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            background: linear-gradient(145deg, #0a1f2e 0%, #1a3a5c 50%, #003153 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1.5rem;
-            color: #e8edf2;
-        }
-        .card {
-            background: #f5f0e8;
-            color: #1a2a3a;
-            border-radius: 16px;
-            padding: 2.5rem 2rem;
-            max-width: 580px;
-            width: 100%;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-        h1 {
-            font-family: 'Georgia', serif;
-            font-size: 1.8rem;
-            color: #003153;
-            text-align: center;
-            margin-bottom: 0.25rem;
-            letter-spacing: 0.5px;
-        }
-        .subtitle {
-            text-align: center;
-            font-style: italic;
-            color: #5a6a7a;
-            font-size: 0.9rem;
-            margin-bottom: 0.9rem;
-        }
-        .outdoor-banner {
-            background: #fff4d6;
-            border: 1px solid #d4a017;
-            border-left: 5px solid #d4a017;
-            color: #6a4a00;
-            border-radius: 6px;
-            padding: 0.6rem 0.9rem;
-            font-size: 0.82rem;
-            line-height: 1.45;
-            margin-bottom: 1.6rem;
-            text-align: center;
-        }
-        .outdoor-banner strong { color: #4a3200; }
-        label {
-            display: block;
-            margin-top: 1.2rem;
-            font-weight: bold;
-            font-size: 0.9rem;
-            color: #2a4a6a;
-            letter-spacing: 0.3px;
-        }
-        input, select {
-            width: 100%;
-            padding: 0.7rem 0.8rem;
-            margin-top: 0.35rem;
-            border: 2px solid #c0d0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            background: #fffdf9;
-            color: #1a2a3a;
-            transition: border-color 0.2s;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #003153;
-        }
-        .row {
-            display: flex;
-            gap: 1rem;
-        }
-        .row > div { flex: 1; }
-        button {
-            margin-top: 1.8rem;
-            padding: 0.9rem;
-            width: 100%;
-            font-size: 1.1rem;
-            font-weight: bold;
-            font-family: 'Georgia', serif;
-            letter-spacing: 1px;
-            color: #fff;
-            background: #003153;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            box-shadow: 0 4px 12px rgba(0,49,83,0.3);
-        }
-        button:hover { background: #004a7a; }
-        button:active { transform: scale(0.98); }
-        #result {
-            margin-top: 1.5rem;
-            padding: 1.3rem;
-            background: linear-gradient(135deg, #e8f0f8, #d0e0f0);
-            border-left: 5px solid #003153;
-            border-radius: 8px;
-            display: none;
-        }
-        #result.visible { display: block; }
-        .time {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #003153;
-            text-align: center;
-            margin: 0.5rem 0;
-        }
-        .detail {
-            font-size: 0.82rem;
-            color: #5a6a7a;
-            text-align: center;
-            line-height: 1.6;
-        }
-        .timer-section {
-            margin-top: 1rem;
-            display: none;
-        }
-        .timer-section.visible { display: block; }
-        .timer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.25rem;
-            padding: 0 0.2rem;
-        }
-        .timer-header .label-small {
-            font-size: 0.75rem;
-            color: #7a8a9a;
-            font-style: italic;
-        }
-        .test-sound {
-            background: none;
-            border: none;
-            color: #003153;
-            font-size: 0.75rem;
-            cursor: pointer;
-            text-decoration: underline;
-            padding: 0.2rem 0.4rem;
-            box-shadow: none;
-            margin: 0;
-            width: auto;
-            font-family: inherit;
-            letter-spacing: normal;
-        }
-        .test-sound:hover { background: none; color: #004a7a; }
-        #timer-display {
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-align: center;
-            color: #003153;
-            margin: 0.4rem 0;
-            font-family: 'Courier New', monospace;
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: color 0.15s, background 0.15s;
-        }
-        #timer-display.flashing {
-            animation: flash 0.5s ease-in-out 6;
-        }
-        @keyframes flash {
-            0%, 100% { color: #003153; background: transparent; }
-            50% { color: #fff; background: #d4a017; }
-        }
-        #timer-btn {
-            background: #2a6a4a;
-            margin-top: 0.5rem;
-        }
-        #timer-btn:hover { background: #3a8a5a; }
-        #timer-btn.complete {
-            background: #d4a017;
-        }
-        #timer-btn.complete:hover { background: #e0b030; }
-        .note {
-            margin-top: 1.2rem;
-            font-size: 0.78rem;
-            color: #7a8a9a;
-            text-align: center;
-            line-height: 1.5;
-            border-top: 1px solid #d0d8e0;
-            padding-top: 0.8rem;
-        }
-        .note strong { color: #5a6a7a; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jacquard Cyanotype Exposure Calculator</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        background: linear-gradient(145deg, #0a1f2e 0%, #1a3a5c 50%, #003153 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 1.5rem;
+        color: #e8edf2;
+    }
+    .card {
+        background: #f5f0e8;
+        color: #1a2a3a;
+        border-radius: 16px;
+        padding: 2rem 1.8rem;
+        max-width: 620px;
+        width: 100%;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+        border: 1px solid rgba(255,255,255,0.15);
+    }
+    h1 {
+        font-size: 1.8rem;
+        color: #003153;
+        text-align: center;
+        margin-bottom: 0.2rem;
+        letter-spacing: 0.5px;
+    }
+    .subtitle {
+        text-align: center;
+        font-style: italic;
+        color: #5a6a7a;
+        font-size: 0.85rem;
+        margin-bottom: 1.2rem;
+    }
+    .tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.2rem;
+        border-bottom: 2px solid #d0d8e0;
+    }
+    .tab {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 0.7rem 0.5rem;
+        font-family: 'Georgia', serif;
+        font-size: 0.95rem;
+        color: #7a8a9a;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: color 0.2s, border-color 0.2s;
+        font-weight: bold;
+    }
+    .tab:hover { color: #003153; }
+    .tab.active { color: #003153; border-bottom-color: #003153; }
+    .banner {
+        border-radius: 6px;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.82rem;
+        line-height: 1.45;
+        margin-bottom: 1.2rem;
+        text-align: center;
+    }
+    .banner.sun {
+        background: #fff4d6;
+        border: 1px solid #d4a017;
+        border-left: 5px solid #d4a017;
+        color: #6a4a00;
+    }
+    .banner.lamp {
+        background: #e8f0f8;
+        border: 1px solid #4a7aa8;
+        border-left: 5px solid #4a7aa8;
+        color: #1a3a5c;
+    }
+    .banner strong { color: inherit; }
+    label {
+        display: block;
+        margin-top: 1.1rem;
+        font-weight: bold;
+        font-size: 0.88rem;
+        color: #2a4a6a;
+        letter-spacing: 0.3px;
+    }
+    input, select {
+        width: 100%;
+        padding: 0.65rem 0.8rem;
+        margin-top: 0.3rem;
+        border: 2px solid #c0d0e0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: #fffdf9;
+        color: #1a2a3a;
+        font-family: inherit;
+        transition: border-color 0.2s;
+    }
+    input:focus, select:focus { outline: none; border-color: #003153; }
+    .row { display: flex; gap: 1rem; }
+    .row > div { flex: 1; }
+    .location-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.4rem;
+        flex-wrap: wrap;
+    }
+    .location-row input { flex: 1; min-width: 130px; margin-top: 0; }
+    .btn {
+        padding: 0.55rem 0.9rem;
+        font-size: 0.85rem;
+        font-family: inherit;
+        font-weight: bold;
+        color: #fff;
+        background: #003153;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .btn:hover { background: #004a7a; }
+    .btn.ghost {
+        background: #e0e8f0;
+        color: #003153;
+    }
+    .btn.ghost:hover { background: #c8d8e8; }
+    .calc-btn {
+        margin-top: 1.6rem;
+        padding: 0.9rem;
+        width: 100%;
+        font-size: 1.05rem;
+        font-weight: bold;
+        font-family: inherit;
+        letter-spacing: 1px;
+        color: #fff;
+        background: #003153;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+        box-shadow: 0 4px 12px rgba(0,49,83,0.3);
+    }
+    .calc-btn:hover { background: #004a7a; }
+    .calc-btn:active { transform: scale(0.98); }
+    #dataStatus {
+        font-size: 0.8rem;
+        color: #5a6a7a;
+        margin-top: 0.5rem;
+        min-height: 1.2em;
+        line-height: 1.4;
+    }
+    #dataStatus.error { color: #b04020; }
+    #dataStatus.success { color: #2a6a4a; }
+    #cityResults {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.5rem;
+    }
+    .city-btn {
+        background: #e8f0f8;
+        border: 1px solid #b0c8dc;
+        color: #003153;
+        padding: 0.35rem 0.7rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        font-family: inherit;
+    }
+    .city-btn:hover { background: #d0e0f0; }
+    .profile-row {
+        display: flex;
+        gap: 0.4rem;
+        margin-top: 0.3rem;
+        align-items: center;
+    }
+    .profile-row input[type=number] {
+        flex: 0 0 80px;
+        margin-top: 0;
+    }
+    .profile-row select {
+        flex: 1;
+        margin-top: 0;
+        font-size: 0.85rem;
+    }
+    .profile-row .btn { padding: 0.5rem 0.65rem; font-size: 0.8rem; }
+    .result-panel {
+        margin-top: 1.5rem;
+        padding: 1.3rem;
+        background: linear-gradient(135deg, #e8f0f8, #d0e0f0);
+        border-left: 5px solid #003153;
+        border-radius: 8px;
+        display: none;
+    }
+    .result-panel.visible { display: block; }
+    .time {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #003153;
+        text-align: center;
+        margin: 0.3rem 0;
+    }
+    .detail {
+        font-size: 0.8rem;
+        color: #5a6a7a;
+        text-align: center;
+        line-height: 1.6;
+    }
+    .detail em { color: #3a6a9a; font-style: italic; }
+    .timer-section { margin-top: 1rem; }
+    .timer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 0.2rem;
+    }
+    .label-small {
+        font-size: 0.75rem;
+        color: #7a8a9a;
+        font-style: italic;
+    }
+    .test-sound {
+        background: none;
+        border: none;
+        color: #003153;
+        font-size: 0.75rem;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0.2rem 0.4rem;
+        font-family: inherit;
+    }
+    .test-sound:hover { color: #004a7a; }
+    #timer-display {
+        font-size: 1.8rem;
+        font-weight: bold;
+        text-align: center;
+        color: #003153;
+        margin: 0.4rem 0;
+        font-family: 'Courier New', monospace;
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: color 0.15s, background 0.15s;
+    }
+    #timer-display.flashing { animation: flash 0.5s ease-in-out 6; }
+    @keyframes flash {
+        0%, 100% { color: #003153; background: transparent; }
+        50% { color: #fff; background: #d4a017; }
+    }
+    #timer-btn {
+        background: #2a6a4a;
+        width: 100%;
+        margin-top: 0.4rem;
+        padding: 0.8rem;
+    }
+    #timer-btn:hover { background: #3a8a5a; }
+    #timer-btn.complete { background: #d4a017; }
+    #timer-btn.complete:hover { background: #e0b030; }
+    .stepwedge { margin-top: 1rem; border-top: 1px solid #b0c8dc; padding-top: 0.8rem; }
+    .stepwedge summary {
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.88rem;
+        color: #003153;
+        padding: 0.3rem 0;
+        user-select: none;
+    }
+    .stepwedge summary:hover { color: #004a7a; }
+    .step-intro {
+        font-size: 0.78rem;
+        color: #5a6a7a;
+        line-height: 1.5;
+        margin: 0.5rem 0;
+    }
+    .step-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+        gap: 0.4rem;
+    }
+    .step-cell {
+        background: #fffdf9;
+        border: 1px solid #c0d0e0;
+        border-radius: 6px;
+        padding: 0.5rem 0.3rem;
+        text-align: center;
+    }
+    .step-cell.highlight {
+        border-color: #003153;
+        border-width: 2px;
+        background: #e0ecf8;
+    }
+    .step-label {
+        font-size: 0.68rem;
+        color: #7a8a9a;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.2rem;
+    }
+    .step-time {
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: #003153;
+    }
+    .settings-row {
+        margin-top: 1.2rem;
+        font-size: 0.82rem;
+        color: #5a6a7a;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .settings-row label {
+        margin: 0;
+        font-weight: normal;
+        font-size: 0.82rem;
+        color: #5a6a7a;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+    }
+    .settings-row input[type=checkbox] { width: auto; margin: 0; }
+    .footnote {
+        margin-top: 1.2rem;
+        font-size: 0.76rem;
+        color: #7a8a9a;
+        text-align: center;
+        line-height: 1.5;
+        border-top: 1px solid #d0d8e0;
+        padding-top: 0.8rem;
+    }
+    .footnote strong { color: #5a6a7a; }
+    .footnote a { color: #003153; }
+    .error-msg {
+        text-align: center;
+        color: #b04020;
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+    .warn-banner {
+        background: #fff0d6;
+        border: 1px solid #d4a017;
+        color: #6a4a00;
+        border-radius: 6px;
+        padding: 0.5rem 0.8rem;
+        font-size: 0.78rem;
+        margin-top: 0.8rem;
+        line-height: 1.4;
+    }
+    @media (max-width: 480px) {
+        .card { padding: 1.5rem 1.2rem; }
+        h1 { font-size: 1.5rem; }
+        .row { flex-direction: column; gap: 0; }
+        .time { font-size: 1.6rem; }
+        #timer-display { font-size: 1.5rem; }
+        .profile-row { flex-wrap: wrap; }
+    }
+</style>
 </head>
 <body>
-    <div class="card">
-        <h1>☀ Cyanotype Exposure</h1>
-        <p class="subtitle">Jacquard Sensitizer Set · calibrated to community data</p>
+<div class="card">
+    <h1>☀ Cyanotype Exposure</h1>
+    <p class="subtitle">Jacquard Sensitizer Set · community-calibrated</p>
 
-        <div class="outdoor-banner">
-            ☀ <strong>Outdoor sunlight only.</strong> Calibrated for direct sun exposure — not for
-            UV lamp work, which needs a much shorter, lamp-specific curve.
+    <div class="tabs">
+        <button class="tab active" data-mode="sun" onclick="switchTab('sun')">☀ Sunlight</button>
+        <button class="tab" data-mode="lamp" onclick="switchTab('lamp')">💡 UV Lamp</button>
+    </div>
+
+    <!-- ===== SUN MODE ===== -->
+    <div id="sunMode">
+        <div class="banner sun">
+            ☀ <strong>Outdoor sunlight only.</strong> Calibrated for direct sun — not UV lamps.
         </div>
+
+        <label>Get current conditions</label>
+        <div class="location-row">
+            <button class="btn ghost" onclick="useMyLocation()">📍 Use my location</button>
+            <input id="citySearch" placeholder="…or enter a city" onkeydown="if(event.key==='Enter'){event.preventDefault();searchCity();}">
+            <button class="btn ghost" onclick="searchCity()">🔎 Search</button>
+        </div>
+        <div id="cityResults"></div>
+        <div id="dataStatus"></div>
 
         <div class="row">
             <div>
                 <label for="uvIndex">UV Index</label>
-                <input type="number" id="uvIndex" value="8" min="0" max="15" step="0.1">
+                <input type="number" id="uvIndex" value="6" min="0" max="15" step="0.1">
             </div>
             <div>
                 <label for="cloudCover">Sky Condition</label>
                 <select id="cloudCover">
                     <option value="1.0">Clear sky</option>
+                    <option value="1.1">Mostly clear</option>
                     <option value="1.3">Scattered clouds</option>
                     <option value="2.0">Broken / partly cloudy</option>
                     <option value="3.5">Overcast / heavy cloud</option>
@@ -219,192 +407,624 @@
             </div>
         </div>
 
-        <label for="calibration">Calibration Factor (fine-tune after test prints)</label>
-        <input type="number" id="calibration" value="1.0" min="0.4" max="3.0" step="0.1">
-
-        <button onclick="calculate()">Calculate Exposure Time</button>
-
-        <div id="result">
-            <div class="time" id="timeDisplay">—</div>
-            <div class="detail" id="detailDisplay"></div>
-
-            <div class="timer-section" id="timerSection">
-                <div class="timer-header">
-                    <span class="label-small">Exposure timer</span>
-                    <button class="test-sound" onclick="testBeep()">🔊 test sound</button>
-                </div>
-                <div id="timer-display">00:00</div>
-                <button id="timer-btn" onclick="toggleTimer()">Start Exposure Timer</button>
-            </div>
+        <label for="sunCalibration">Calibration factor</label>
+        <div class="profile-row">
+            <input type="number" id="sunCalibration" value="1.0" min="0.4" max="3.0" step="0.1">
+            <select id="sunProfiles" onchange="loadProfile('sun', this.value)">
+                <option value="">— saved profiles —</option>
+            </select>
+            <button class="btn ghost" onclick="saveProfile('sun')" title="Save current factor as a named profile">💾</button>
+            <button class="btn ghost" onclick="deleteProfile('sun')" title="Delete selected profile">🗑</button>
         </div>
 
-        <div class="note">
-            <strong>Outdoor use only.</strong> This estimator is calibrated for sunlight — UV lamps
-            emit a different spectrum and require their own exposure curve.
-            Community-sourced data still shows wide variation from paper, coating thickness,
-            humidity, and negative density. <strong>Always run a test strip</strong> before a final print.
-        </div>
+        <button class="calc-btn" onclick="calculateSun()">Calculate Exposure Time</button>
+        <p class="footnote" style="border:none;padding-top:0.5rem;margin-top:0.5rem">
+            Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>
+            · free, no API key.
+        </p>
     </div>
 
-    <script>
-        let timerInterval = null;
-        let timerRunning = false;
-        let remainingSeconds = 0;
-        let audioCtx = null;
+    <!-- ===== LAMP MODE ===== -->
+    <div id="lampMode" style="display:none">
+        <div class="banner lamp">
+            💡 <strong>UV lamp mode.</strong> Highly variable — lamp spectrum, age, and reflector design
+            all matter. Calibrate with a test strip.
+        </div>
 
-        // Lazily create the AudioContext. Created on first user gesture
-        // (button click) so browsers allow it to play.
-        function getAudioCtx() {
-            if (!audioCtx) {
-                const Ctx = window.AudioContext || window.webkitAudioContext;
-                if (!Ctx) return null;
-                audioCtx = new Ctx();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            return audioCtx;
-        }
+        <label for="lampType">Lamp type</label>
+        <select id="lampType" onchange="updateLampNote()">
+            <option value="blb">BLB fluorescent tube (15–20W)</option>
+            <option value="led365">UV LED 365nm (~50W panel)</option>
+            <option value="led395">UV LED 395nm (~50W panel)</option>
+            <option value="mercury">Mercury vapor (400W)</option>
+            <option value="metalhalide">Metal halide (400W)</option>
+        </select>
+        <div id="lampNote" class="warn-banner" style="display:none"></div>
 
-        function beep(freq, startTime, duration, ctx) {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0, startTime);
-            gain.gain.linearRampToValueAtTime(0.25, startTime + 0.01);
-            gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(startTime);
-            osc.stop(startTime + duration + 0.02);
-        }
+        <label for="lampDistance">Distance from lamp to print (inches)</label>
+        <input type="number" id="lampDistance" value="5" min="1" max="60" step="0.5">
 
-        // "ding-ding-ding-DING" completion pattern.
-        function playCompleteBeeps() {
-            const ctx = getAudioCtx();
-            if (!ctx) return;
-            const now = ctx.currentTime + 0.05;
-            beep(880, now,        0.14, ctx);
-            beep(880, now + 0.24, 0.14, ctx);
-            beep(880, now + 0.48, 0.14, ctx);
-            beep(1320, now + 0.74, 0.55, ctx);
-        }
+        <label for="lampCalibration">Calibration factor</label>
+        <div class="profile-row">
+            <input type="number" id="lampCalibration" value="1.0" min="0.3" max="4.0" step="0.1">
+            <select id="lampProfiles" onchange="loadProfile('lamp', this.value)">
+                <option value="">— saved profiles —</option>
+            </select>
+            <button class="btn ghost" onclick="saveProfile('lamp')" title="Save current factor as a named profile">💾</button>
+            <button class="btn ghost" onclick="deleteProfile('lamp')" title="Delete selected profile">🗑</button>
+        </div>
 
-        // Short single beep used by the "test sound" link.
-        function testBeep() {
-            const ctx = getAudioCtx();
-            if (!ctx) return;
-            const now = ctx.currentTime + 0.02;
-            beep(1000, now, 0.18, ctx);
-        }
+        <button class="calc-btn" onclick="calculateLamp()">Calculate Exposure Time</button>
+    </div>
 
-        function getBaselineMinutes(uv) {
-            if (uv < 1) return null;
-            if (uv < 2) return 22;
-            if (uv < 3) return 18;
-            if (uv < 4) return 12;
-            if (uv < 5) return 9;
-            if (uv < 6) return 7;
-            if (uv < 7) return 5.5;
-            if (uv < 8) return 4.5;
-            if (uv < 10) return 3.5;
-            return 2.8;
-        }
+    <!-- ===== SHARED RESULT PANEL ===== -->
+    <div id="resultPanel" class="result-panel">
+        <div class="time" id="timeDisplay">—</div>
+        <div class="detail" id="detailDisplay"></div>
 
-        function calculate() {
-            const uv = parseFloat(document.getElementById('uvIndex').value);
-            const cloudFactor = parseFloat(document.getElementById('cloudCover').value);
-            const cal = parseFloat(document.getElementById('calibration').value);
+        <div class="timer-section">
+            <div class="timer-header">
+                <span class="label-small">Exposure timer</span>
+                <button class="test-sound" onclick="testBeep()">🔊 test sound</button>
+            </div>
+            <div id="timer-display">00:00</div>
+            <button id="timer-btn" class="btn" onclick="toggleTimer()">Start Exposure Timer</button>
+        </div>
 
-            const base = getBaselineMinutes(uv);
-            if (base === null) {
-                document.getElementById('result').classList.add('visible');
-                document.getElementById('timeDisplay').textContent = '—';
-                document.getElementById('detailDisplay').textContent =
-                    'UV Index is too low for a reliable exposure. Wait for stronger light.';
-                document.getElementById('timerSection').classList.remove('visible');
-                return;
-            }
+        <details class="stepwedge">
+            <summary>📏 Test strip helper</summary>
+            <div id="stepwedgeContent"></div>
+        </details>
+    </div>
 
-            const minutes = base * cloudFactor * cal;
-            const mins = Math.floor(minutes);
-            const secs = Math.round((minutes - mins) * 60);
+    <div class="settings-row">
+        <label>
+            <input type="checkbox" id="beepEnabled" checked onchange="onBeepToggle()">
+            Beep on timer completion
+        </label>
+        <button class="test-sound" onclick="testBeep()">🔊 test</button>
+    </div>
 
-            document.getElementById('result').classList.add('visible');
-            document.getElementById('timeDisplay').textContent =
-                `${mins} min ${secs.toString().padStart(2, '0')} sec`;
+    <p class="footnote">
+        <strong>An estimator, not an oracle.</strong> Paper, coating thickness, humidity, and negative
+        density all shift the result. Always run a test strip before a final print.
+        Calibration profiles make the next session faster.
+    </p>
+</div>
 
-            document.getElementById('detailDisplay').innerHTML =
-                `Baseline: <strong>${base.toFixed(1)} min</strong> &nbsp;×&nbsp; ` +
-                `Cloud: <strong>${cloudFactor}×</strong> &nbsp;×&nbsp; ` +
-                `Calibration: <strong>${cal}×</strong>`;
+<script>
+/* ============================================================
+   CONSTANTS
+============================================================ */
 
-            remainingSeconds = Math.round(minutes * 60);
-            document.getElementById('timerSection').classList.add('visible');
-            resetTimer();
+const LAMP_TYPES = {
+    blb: {
+        name: 'BLB fluorescent tube (15–20W)',
+        refDist: 5,
+        refTime: 10,
+        note: 'BLB tubes take 5–10 min to reach full UV output — start the timer only after warm-up.'
+    },
+    led365: {
+        name: 'UV LED 365nm (~50W panel)',
+        refDist: 12,
+        refTime: 5
+    },
+    led395: {
+        name: 'UV LED 395nm (~50W panel)',
+        refDist: 12,
+        refTime: 6
+    },
+    mercury: {
+        name: 'Mercury vapor (400W)',
+        refDist: 18,
+        refTime: 3,
+        note: 'Mercury vapor lamps also need warm-up and are extremely bright — protect your eyes.'
+    },
+    metalhalide: {
+        name: 'Metal halide (400W)',
+        refDist: 18,
+        refTime: 3,
+        note: 'Metal halide lamps need warm-up time; use UV-safe eyewear.'
+    }
+};
+
+const PROFILE_KEYS = {
+    sun: 'cyanotype_sun_profiles',
+    lamp: 'cyanotype_lamp_profiles'
+};
+
+/* ============================================================
+   STATE
+============================================================ */
+
+const timer = { remaining: 0, total: 0, interval: null, running: false };
+let audioCtx = null;
+
+/* ============================================================
+   TAB SWITCHING
+============================================================ */
+
+function switchTab(mode) {
+    document.querySelectorAll('.tab').forEach(t =>
+        t.classList.toggle('active', t.dataset.mode === mode));
+    document.getElementById('sunMode').style.display  = mode === 'sun'  ? 'block' : 'none';
+    document.getElementById('lampMode').style.display = mode === 'lamp' ? 'block' : 'none';
+    if (mode === 'lamp') updateLampNote();
+}
+
+/* ============================================================
+   AUDIO
+============================================================ */
+
+function getAudioCtx() {
+    if (!audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return null;
+        audioCtx = new Ctx();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+}
+
+function beep(freq, start, duration, ctx) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, start);
+    gain.gain.linearRampToValueAtTime(0.25, start + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + duration + 0.02);
+}
+
+function playCompleteBeeps() {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime + 0.05;
+    beep(880,  now,        0.14, ctx);
+    beep(880,  now + 0.24, 0.14, ctx);
+    beep(880,  now + 0.48, 0.14, ctx);
+    beep(1320, now + 0.74, 0.55, ctx);
+}
+
+function testBeep() {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    beep(1000, ctx.currentTime + 0.02, 0.18, ctx);
+}
+
+let beepEnabled = true;
+function onBeepToggle() {
+    beepEnabled = document.getElementById('beepEnabled').checked;
+    try { localStorage.setItem('cyanotype_beep', beepEnabled ? '1' : '0'); } catch (e) {}
+}
+
+/* ============================================================
+   SUN BASELINE (community-tuned)
+============================================================ */
+
+function getBaselineMinutes(uv) {
+    if (uv < 0.5) return null;
+    if (uv < 1)   return 30;
+    if (uv < 2)   return 22;
+    if (uv < 3)   return 18;
+    if (uv < 4)   return 12;
+    if (uv < 5)   return 9;
+    if (uv < 6)   return 7;
+    if (uv < 7)   return 5.5;
+    if (uv < 8)   return 4.5;
+    if (uv < 10)  return 3.5;
+    return 2.8;
+}
+
+function calculateSun() {
+    const uv          = parseFloat(document.getElementById('uvIndex').value);
+    const cloudFactor = parseFloat(document.getElementById('cloudCover').value);
+    const cal         = parseFloat(document.getElementById('sunCalibration').value);
+
+    const base = getBaselineMinutes(uv);
+    if (base === null) {
+        showError('UV Index is too low for a reliable exposure. Wait for stronger light or use a lamp.');
+        return;
+    }
+
+    const minutes = base * cloudFactor * cal;
+
+    let warning = '';
+    if (uv < 2) warning = '⚠ Very low UV — exposure will be long and any cloud movement will matter.';
+    if (uv >= 8) warning = '';
+
+    showResult({
+        minutes,
+        detail: `Baseline <strong>${base.toFixed(1)} min</strong> &nbsp;×&nbsp; ` +
+                `Cloud <strong>${cloudFactor}×</strong> &nbsp;×&nbsp; ` +
+                `Calibration <strong>${cal}×</strong>`,
+        warning
+    });
+}
+
+/* ============================================================
+   LAMP
+============================================================ */
+
+function updateLampNote() {
+    const type = document.getElementById('lampType').value;
+    const lamp = LAMP_TYPES[type];
+    const el = document.getElementById('lampNote');
+    if (lamp && lamp.note) {
+        el.textContent = 'ℹ ' + lamp.note;
+        el.style.display = 'block';
+    } else {
+        el.style.display = 'none';
+    }
+}
+
+function calculateLamp() {
+    const type     = document.getElementById('lampType').value;
+    const lamp     = LAMP_TYPES[type];
+    const distance = parseFloat(document.getElementById('lampDistance').value);
+    const cal      = parseFloat(document.getElementById('lampCalibration').value);
+
+    if (!lamp || !isFinite(distance) || distance <= 0) {
+        showError('Please enter a valid lamp type and distance.');
+        return;
+    }
+
+    // Inverse-square approximation for point-like sources.
+    // (Fluorescent tubes fall off more linearly — calibration factor absorbs the difference.)
+    const distanceFactor = Math.pow(distance / lamp.refDist, 2);
+    const minutes = lamp.refTime * distanceFactor * cal;
+
+    showResult({
+        minutes,
+        detail: `Reference <strong>${lamp.refTime} min</strong> at ${lamp.refDist}" ` +
+                `&nbsp;×&nbsp; distance <strong>${distanceFactor.toFixed(2)}×</strong> ` +
+                `&nbsp;×&nbsp; calibration <strong>${cal}×</strong>` +
+                (lamp.note ? `<br><em>${lamp.note}</em>` : ''),
+        warning: '⚠ Lamp times vary widely between units. Calibrate with a test strip before a final print.'
+    });
+}
+
+/* ============================================================
+   RESULT DISPLAY
+============================================================ */
+
+function formatTime(minutes) {
+    if (minutes >= 60) {
+        const h = Math.floor(minutes / 60);
+        const m = Math.round(minutes - h * 60);
+        return `${h} hr ${m} min`;
+    }
+    const m = Math.floor(minutes);
+    const s = Math.round((minutes - m) * 60);
+    if (m === 0) return `${s} sec`;
+    return `${m} min ${String(s).padStart(2, '0')} sec`;
+}
+
+function showError(msg) {
+    const panel = document.getElementById('resultPanel');
+    panel.classList.add('visible');
+    document.getElementById('timeDisplay').innerHTML =
+        `<span class="error-msg">${msg}</span>`;
+    document.getElementById('detailDisplay').innerHTML = '';
+    document.getElementById('stepwedgeContent').innerHTML = '';
+    resetTimer();
+}
+
+function showResult({ minutes, detail, warning }) {
+    const panel = document.getElementById('resultPanel');
+    panel.classList.add('visible');
+
+    document.getElementById('timeDisplay').textContent = formatTime(minutes);
+    document.getElementById('detailDisplay').innerHTML =
+        detail + (warning ? `<div class="warn-banner" style="text-align:left;margin-top:0.6rem">${warning}</div>` : '');
+
+    buildStepWedge(minutes);
+
+    // Reset timer for the new estimate
+    resetTimer();
+    timer.total = Math.round(minutes * 60);
+    timer.remaining = timer.total;
+    updateTimerDisplay();
+
+    const btn = document.getElementById('timer-btn');
+    btn.textContent = 'Start Exposure Timer';
+    btn.classList.remove('complete');
+    document.getElementById('timer-display').classList.remove('flashing');
+
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ============================================================
+   STEP WEDGE
+============================================================ */
+
+function buildStepWedge(minutes) {
+    const container = document.getElementById('stepwedgeContent');
+    const brackets = [
+        { label: 'half',   factor: 0.5 },
+        { label: '¾',      factor: 0.75 },
+        { label: 'est.',   factor: 1.0, highlight: true },
+        { label: '1¼×',    factor: 1.25 },
+        { label: '1½×',    factor: 1.5 },
+        { label: '2×',     factor: 2.0 }
+    ];
+
+    let html = '<p class="step-intro">' +
+        'Run a test strip at several exposures around the estimate, then pick the one that gives ' +
+        'the deepest blue <em>without</em> losing highlight detail.' +
+        '</p><div class="step-grid">';
+    brackets.forEach(b => {
+        html += `<div class="step-cell${b.highlight ? ' highlight' : ''}">
+            <div class="step-label">${b.label}</div>
+            <div class="step-time">${formatTime(minutes * b.factor)}</div>
+        </div>`;
+    });
+    html += '</div>';
+
+    // Progressive pull schedule — 6 segments, cumulative exposure
+    const step = minutes / 3;
+    html += '<p class="step-intro" style="margin-top:1rem">' +
+        '<strong>Progressive pull (one strip, six segments):</strong> ' +
+        'cover the whole strip, then uncover one segment every ' +
+        `<strong>${formatTime(step)}</strong>. Segment <em>n</em> receives <em>n</em>× that interval.` +
+        '</p><div class="step-grid">';
+    for (let i = 1; i <= 6; i++) {
+        const cum = step * i;
+        const highlight = i === 3 ? ' highlight' : '';
+        html += `<div class="step-cell${highlight}">
+            <div class="step-label">seg ${i}</div>
+            <div class="step-time">${formatTime(cum)}</div>
+        </div>`;
+    }
+    html += '</div>';
+
+    container.innerHTML = html;
+}
+
+/* ============================================================
+   TIMER
+============================================================ */
+
+function updateTimerDisplay() {
+    const m = Math.floor(timer.remaining / 60);
+    const s = timer.remaining % 60;
+    document.getElementById('timer-display').textContent =
+        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function resetTimer() {
+    if (timer.interval) clearInterval(timer.interval);
+    timer.interval = null;
+    timer.running = false;
+    const btn = document.getElementById('timer-btn');
+    if (btn) {
+        btn.textContent = 'Start Exposure Timer';
+        btn.classList.remove('complete');
+    }
+    const disp = document.getElementById('timer-display');
+    if (disp) disp.classList.remove('flashing');
+}
+
+function toggleTimer() {
+    const btn = document.getElementById('timer-btn');
+    const disp = document.getElementById('timer-display');
+
+    if (timer.running) {
+        clearInterval(timer.interval);
+        timer.running = false;
+        btn.textContent = 'Resume Timer';
+        return;
+    }
+
+    if (timer.remaining <= 0) timer.remaining = timer.total;
+    if (timer.remaining <= 0) return;
+
+    getAudioCtx(); // unlock on user gesture
+    timer.running = true;
+    btn.textContent = 'Pause Timer';
+    btn.classList.remove('complete');
+    disp.classList.remove('flashing');
+
+    timer.interval = setInterval(() => {
+        timer.remaining--;
+        updateTimerDisplay();
+        if (timer.remaining <= 0) {
+            clearInterval(timer.interval);
+            timer.running = false;
+            timer.remaining = 0;
             updateTimerDisplay();
+            btn.textContent = 'Timer Complete ✓ — Restart';
+            btn.classList.add('complete');
+            disp.classList.add('flashing');
+            if (beepEnabled) playCompleteBeeps();
+        }
+    }, 1000);
+}
+
+/* ============================================================
+   PROFILES (localStorage)
+============================================================ */
+
+function getProfiles(mode) {
+    try {
+        return JSON.parse(localStorage.getItem(PROFILE_KEYS[mode]) || '[]');
+    } catch (e) {
+        return [];
+    }
+}
+
+function setProfiles(mode, list) {
+    try {
+        localStorage.setItem(PROFILE_KEYS[mode], JSON.stringify(list));
+    } catch (e) {}
+}
+
+function refreshProfileSelect(mode) {
+    const select = document.getElementById(mode + 'Profiles');
+    const profiles = getProfiles(mode);
+    select.innerHTML = '<option value="">— saved profiles —</option>';
+    profiles.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.name;
+        opt.textContent = `${p.name} (${p.factor}×)`;
+        select.appendChild(opt);
+    });
+}
+
+function loadProfile(mode, name) {
+    if (!name) return;
+    const p = getProfiles(mode).find(x => x.name === name);
+    if (p) {
+        document.getElementById(mode + 'Calibration').value = p.factor;
+    }
+}
+
+function saveProfile(mode) {
+    const factorInputId = mode === 'sun' ? 'sunCalibration' : 'lampCalibration';
+    const factor = parseFloat(document.getElementById(factorInputId).value);
+    if (!isFinite(factor)) { alert('Please enter a valid calibration factor first.'); return; }
+    const name = prompt('Name this calibration profile:\n(e.g. "Arches Platine / thin coat")');
+    if (!name || !name.trim()) return;
+    const trimmed = name.trim();
+    const profiles = getProfiles(mode).filter(p => p.name !== trimmed);
+    profiles.push({ name: trimmed, factor });
+    profiles.sort((a, b) => a.name.localeCompare(b.name));
+    setProfiles(mode, profiles);
+    refreshProfileSelect(mode);
+    document.getElementById(mode + 'Profiles').value = trimmed;
+}
+
+function deleteProfile(mode) {
+    const select = document.getElementById(mode + 'Profiles');
+    const name = select.value;
+    if (!name) { alert('Select a saved profile to delete first.'); return; }
+    if (!confirm(`Delete profile "${name}"?`)) return;
+    setProfiles(mode, getProfiles(mode).filter(p => p.name !== name));
+    refreshProfileSelect(mode);
+}
+
+/* ============================================================
+   LIVE WEATHER (Open-Meteo)
+============================================================ */
+
+function setStatus(msg, cls) {
+    const el = document.getElementById('dataStatus');
+    el.textContent = msg;
+    el.className = cls || '';
+}
+
+function useMyLocation() {
+    if (!navigator.geolocation) {
+        setStatus('Geolocation is not available in this browser. Enter UV manually.', 'error');
+        return;
+    }
+    setStatus('📍 Getting your location…');
+    navigator.geolocation.getCurrentPosition(
+        pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+        err => setStatus('Location unavailable or denied. Enter UV manually or search a city.', 'error'),
+        { timeout: 10000, maximumAge: 5 * 60 * 1000 }
+    );
+}
+
+async function searchCity() {
+    const q = document.getElementById('citySearch').value.trim();
+    if (!q) return;
+    const results = document.getElementById('cityResults');
+    results.innerHTML = '';
+    setStatus(`🔎 Searching for "${q}"…`);
+
+    try {
+        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=en&format=json`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (!data.results || data.results.length === 0) {
+            setStatus('No matching locations. Try a different spelling.', 'error');
+            return;
+        }
+        setStatus('');
+        data.results.forEach(r => {
+            const btn = document.createElement('button');
+            btn.className = 'city-btn';
+            const parts = [r.name];
+            if (r.admin1 && r.admin1 !== r.name) parts.push(r.admin1);
+            if (r.country) parts.push(r.country);
+            btn.textContent = parts.join(', ');
+            btn.onclick = () => {
+                results.innerHTML = '';
+                const label = parts.join(', ');
+                fetchWeather(r.latitude, r.longitude, label);
+            };
+            results.appendChild(btn);
+        });
+    } catch (e) {
+        setStatus('⚠ Location search failed. Check your connection and try again.', 'error');
+    }
+}
+
+async function fetchWeather(lat, lon, label) {
+    setStatus('🌤 Fetching current conditions…');
+    try {
+        const url = `https://api.open-meteo.com/v1/forecast` +
+            `?latitude=${lat}&longitude=${lon}` +
+            `&current=uv_index,cloud_cover,temperature_2m,is_day&timezone=auto`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        const c = data.current || {};
+
+        if (c.is_day === 0) {
+            setStatus("🌙 It's night where you are — no UV to measure. Enter values manually or try again during daylight.", 'error');
+            return;
         }
 
-        function updateTimerDisplay() {
-            const m = Math.floor(remainingSeconds / 60);
-            const s = remainingSeconds % 60;
-            document.getElementById('timer-display').textContent =
-                `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        if (typeof c.uv_index === 'number') {
+            document.getElementById('uvIndex').value = c.uv_index.toFixed(1);
         }
 
-        function resetTimer() {
-            if (timerInterval) clearInterval(timerInterval);
-            timerRunning = false;
-            timerInterval = null;
-            const btn = document.getElementById('timer-btn');
-            btn.textContent = 'Start Exposure Timer';
-            btn.classList.remove('complete');
-            document.getElementById('timer-display').classList.remove('flashing');
+        const cc = typeof c.cloud_cover === 'number' ? c.cloud_cover : null;
+        if (cc !== null) {
+            let factor;
+            if (cc < 12)       factor = '1.0';
+            else if (cc < 30)  factor = '1.1';
+            else if (cc < 55)  factor = '1.3';
+            else if (cc < 80)  factor = '2.0';
+            else               factor = '3.5';
+            document.getElementById('cloudCover').value = factor;
         }
 
-        function toggleTimer() {
-            const btn = document.getElementById('timer-btn');
-            const display = document.getElementById('timer-display');
+        const temp = typeof c.temperature_2m === 'number'
+            ? `, ${c.temperature_2m.toFixed(0)}°C` : '';
+        const cloudTxt = cc !== null ? `, cloud ${cc}%` : '';
+        const where = label ? ` for ${label}` : '';
+        setStatus(`✅ Updated${where} — UV ${c.uv_index},${cloudTxt}${temp}. You can still override below.`,
+                  'success');
+    } catch (e) {
+        setStatus('⚠ Could not fetch live weather. Enter UV manually.', 'error');
+    }
+}
 
-            if (timerRunning) {
-                clearInterval(timerInterval);
-                timerRunning = false;
-                btn.textContent = 'Resume Timer';
-                return;
-            }
+/* ============================================================
+   INIT
+============================================================ */
 
-            if (remainingSeconds <= 0) {
-                // Timer already finished — restart with current calculation
-                calculate();
-                return;
-            }
+(function init() {
+    refreshProfileSelect('sun');
+    refreshProfileSelect('lamp');
+    updateLampNote();
 
-            // Unlock audio on this user gesture
-            getAudioCtx();
-
-            timerRunning = true;
-            btn.classList.remove('complete');
-            btn.textContent = 'Pause Timer';
-            display.classList.remove('flashing');
-
-            timerInterval = setInterval(() => {
-                remainingSeconds--;
-                updateTimerDisplay();
-                if (remainingSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    timerRunning = false;
-                    remainingSeconds = 0;
-                    updateTimerDisplay();
-
-                    btn.textContent = 'Timer Complete ✓ — Restart';
-                    btn.classList.add('complete');
-                    display.classList.add('flashing');
-
-                    playCompleteBeeps();
-                }
-            }, 1000);
+    try {
+        const saved = localStorage.getItem('cyanotype_beep');
+        if (saved === '0') {
+            beepEnabled = false;
+            document.getElementById('beepEnabled').checked = false;
         }
-    </script>
+    } catch (e) {}
+})();
+</script>
 </body>
 </html>
